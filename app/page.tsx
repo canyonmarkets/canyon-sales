@@ -1,15 +1,18 @@
 'use client'
 import { useState } from 'react'
 import SplashScreen from './components/SplashScreen'
+import AuthGate from './components/AuthGate'
 import Dashboard from './components/Dashboard'
 
 export default function Page() {
   const [done, setDone] = useState(false)
   return (
     <>
-      {/* Dashboard mounts immediately and fetches under the splash, so data is
-          ready by the time the splash fades out. */}
-      <Dashboard />
+      {/* AuthGate shows the login screen until signed in; once authed the
+          Dashboard mounts and fetches under the splash. */}
+      <AuthGate>
+        <Dashboard />
+      </AuthGate>
       {!done && <SplashScreen onDone={() => setDone(true)} />}
     </>
   )

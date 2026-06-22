@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { StoreCode, PresetKey, SaleRow, resolveRange, fetchSales, fetchSalesLite, lastNDaysRange, phxToday, STORES } from '../lib/sales'
+import { supabase } from '../lib/supabase'
 import StoreSelector from './StoreSelector'
 import DateFilter from './DateFilter'
 import SalesSummary from './SalesSummary'
@@ -76,6 +77,10 @@ export default function Dashboard() {
           <button onClick={() => load()} title="Refresh"
             style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, width: 38, height: 38, cursor: 'pointer', fontSize: 16 }}>
             ⟳
+          </button>
+          <button onClick={() => supabase.auth.signOut()} title="Sign out"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, height: 38, padding: '0 14px', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            Sign out
           </button>
         </div>
       </header>

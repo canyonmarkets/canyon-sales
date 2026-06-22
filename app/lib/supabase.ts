@@ -7,4 +7,14 @@ import { createClient } from '@supabase/supabase-js'
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://zgmxmficzvlpzkosdcnx.supabase.co'
 const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'sb_publishable_MUAaPltQkyDFsR0NvLTikQ_gY_pfJFy'
 
-export const supabase = createClient(url, key)
+// persistSession + autoRefreshToken keep the operator logged in indefinitely on
+// their device (session is stored and silently refreshed) — log in once, stay in
+// until "Sign out". storageKey is app-specific so it never collides with the
+// kiosk / vending-dash sessions on the same machine.
+export const supabase = createClient(url, key, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    storageKey: 'canyon-sales-auth',
+  },
+})
