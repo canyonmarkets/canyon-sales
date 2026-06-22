@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Nokian';
+  src: url('/fonts/NokianvirallinenkirjasinREGULAR.ttf') format('truetype');
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  /* Dark chrome, lifted from the kiosk */
+  --bg:          #0a0c10;
+  --bg-2:        #0e1117;
+  --surface:     #151a22;
+  --surface-2:   #1c232e;
+  --border:      rgba(255,255,255,0.08);
+  --border-2:    rgba(255,255,255,0.14);
+  --text:        #f3f6fb;
+  --text-muted:  #9aa6b6;
+  --text-dim:    #5e6b7d;
+  --ember:       #e0631a;
+  --ember-600:   #c94b0c;
+  --ember-glow:  rgba(224,99,26,0.35);
+  --green:       #34d399;
+  --blue:        #38bdf8;
+  --violet:      #a78bfa;
+  --font-brand:  'Nokian', system-ui, sans-serif;
+  --font-num:    'Oswald', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background:
+    radial-gradient(1200px 700px at 80% -10%, rgba(224,99,26,0.10), transparent 60%),
+    radial-gradient(900px 600px at -10% 110%, rgba(56,189,248,0.06), transparent 55%),
+    var(--bg);
+  color: var(--text);
+  font-family: var(--font-num), system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Animations ─────────────────────────────────────────────── */
+@keyframes fadeUp   { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes fadeIn   { from { opacity: 0; } to { opacity: 1; } }
+@keyframes splashLogo { 0% { opacity: 0; transform: scale(0.86) translateY(8px); } 45% { opacity: 1; transform: scale(1) translateY(0); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes splashOut  { to { opacity: 0; visibility: hidden; } }
+@keyframes sheen { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+@keyframes growBar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes pulseGlow { 0%,100% { box-shadow: 0 0 0 0 var(--ember-glow); } 50% { box-shadow: 0 0 22px 2px var(--ember-glow); } }
+
+.fade-up   { animation: fadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+.fade-in   { animation: fadeIn 0.5s ease both; }
+
+/* ── Shared bits ────────────────────────────────────────────── */
+.card {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+.brand-title {
+  font-family: var(--font-brand);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.mono-num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+
+button { font-family: inherit; }
+::selection { background: var(--ember); color: #fff; }
+
+/* scrollbars */
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-thumb { background: var(--surface-2); border-radius: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }

@@ -1,0 +1,25 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+/build
+
+# debug / logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# env files (never commit secrets)
+.env
+.env*.local
+
+# typescript / next
+*.tsbuildinfo
+next-env.d.ts
+
+# deploy / editor
+.netlify
+.vercel
+.DS_Store
