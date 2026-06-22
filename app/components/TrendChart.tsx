@@ -48,7 +48,7 @@ export default function TrendChart({ data }: { data: DayPoint[] }) {
               />
               {i % labelStep === 0 && (
                 <text x={pad.l + i * slot + slot / 2} y={H - pad.b + 18} textAnchor="middle"
-                  fill="#5e6b7d" fontSize={12} fontFamily="var(--font-num)">
+                  fill="#c8d0db" fontSize={12} fontFamily="var(--font-num)">
                   {d.label}
                 </text>
               )}

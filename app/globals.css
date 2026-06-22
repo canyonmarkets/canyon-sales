@@ -15,9 +15,9 @@
   --surface-2:   #1c232e;
   --border:      rgba(255,255,255,0.08);
   --border-2:    rgba(255,255,255,0.14);
-  --text:        #f3f6fb;
-  --text-muted:  #9aa6b6;
-  --text-dim:    #5e6b7d;
+  --text:        #ffffff;
+  --text-muted:  #eef1f6;
+  --text-dim:    #c8d0db;
   --ember:       #e0631a;
   --ember-600:   #c94b0c;
   --ember-glow:  rgba(224,99,26,0.35);
