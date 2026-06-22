@@ -75,7 +75,7 @@ export default function WeeklyPerformance({ rows, store, windowRange }: { rows: 
       </div>
 
       {/* records strip */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
         <Fact icon="🏆" label="Record Day" value={w.bestDay && w.bestDay.total > 0 ? money(w.bestDay.total) : '—'} sub={w.bestDay && w.bestDay.total > 0 ? w.bestDay.label : 'no sales yet'} />
         <Fact icon="📊" label="Daily Avg (7d)" value={money(w.dailyAvg)} sub={`${w.weekTxns} orders this week`} />
         <Fact icon={metric === 'sales' ? '💰' : '🧾'} label="7-Day Total" value={metric === 'sales' ? money(w.weekTotal) : `${w.weekTxns}`} sub={metric === 'sales' ? 'sales' : 'transactions'} />
