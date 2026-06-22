@@ -22,8 +22,8 @@ export default function DateFilter({
               key={p.key}
               onClick={() => onPreset(p.key)}
               style={{
-                padding: '8px 14px', borderRadius: 999, cursor: 'pointer',
-                fontSize: 13, fontWeight: 600,
+                padding: '11px 18px', borderRadius: 999, cursor: 'pointer',
+                fontSize: 14, fontWeight: 600,
                 border: `1px solid ${active ? 'transparent' : 'var(--border-2)'}`,
                 background: active ? 'var(--surface-2)' : 'transparent',
                 color: active ? 'var(--ember)' : 'var(--text-muted)',

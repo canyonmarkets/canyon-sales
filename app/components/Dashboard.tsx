@@ -75,11 +75,11 @@ export default function Dashboard() {
             Live{updatedAt ? ` · ${updatedAt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}` : ''}
           </div>
           <button onClick={() => load()} title="Refresh"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, width: 38, height: 38, cursor: 'pointer', fontSize: 16 }}>
+            style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, width: 44, height: 44, cursor: 'pointer', fontSize: 18 }}>
             ⟳
           </button>
           <button onClick={() => supabase.auth.signOut()} title="Sign out"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, height: 38, padding: '0 14px', cursor: 'pointer', fontSize: 13, fontWeight: 600 }}>
+            style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, height: 44, padding: '0 18px', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
             Sign out
           </button>
         </div>
@@ -98,19 +98,27 @@ export default function Dashboard() {
         />
       </div>
 
-      {/* ── Tabs ── */}
-      <div style={{ display: 'flex', gap: 4, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 4, marginBottom: 22, width: 'fit-content' }}>
-        {([['summary', 'Sales Summary'], ['items', 'Item Sales']] as const).map(([k, label]) => (
-          <button key={k} onClick={() => setTab(k)}
-            style={{
-              padding: '10px 22px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600,
-              background: tab === k ? 'linear-gradient(180deg, var(--ember) 0%, var(--ember-600) 100%)' : 'transparent',
-              color: tab === k ? '#fff' : 'var(--text-muted)',
-              boxShadow: tab === k ? '0 4px 14px var(--ember-glow)' : 'none', transition: 'all 0.18s',
-            }}>
-            {label}
-          </button>
-        ))}
+      {/* ── Tabs — sticky so you can switch views while scrolled on a phone ── */}
+      <div style={{
+        position: 'sticky', top: 0, zIndex: 30,
+        margin: '0 calc(-1 * clamp(16px, 4vw, 40px)) 20px',
+        padding: '10px clamp(16px, 4vw, 40px)',
+        background: 'rgba(10,12,16,0.82)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)',
+        borderBottom: '1px solid var(--border)',
+      }}>
+        <div style={{ display: 'flex', gap: 4, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 4, width: 'fit-content' }}>
+          {([['summary', 'Sales Summary'], ['items', 'Item Sales']] as const).map(([k, label]) => (
+            <button key={k} onClick={() => setTab(k)}
+              style={{
+                padding: '12px 24px', borderRadius: 9, border: 'none', cursor: 'pointer', fontSize: 14, fontWeight: 600,
+                background: tab === k ? 'linear-gradient(180deg, var(--ember) 0%, var(--ember-600) 100%)' : 'transparent',
+                color: tab === k ? '#fff' : 'var(--text-muted)',
+                boxShadow: tab === k ? '0 4px 14px var(--ember-glow)' : 'none', transition: 'all 0.18s',
+              }}>
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div style={{ fontSize: 13, color: 'var(--text-dim)', marginBottom: 16 }}>

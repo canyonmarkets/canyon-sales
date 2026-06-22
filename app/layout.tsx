@@ -4,6 +4,8 @@ import './globals.css'
 export const metadata: Metadata = {
   title: 'Canyon Markets — Sales',
   description: 'Live sales dashboard for Canyon Markets kiosks',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, title: 'Canyon Sales', statusBarStyle: 'default' },
 }
 
 export const viewport: Viewport = {

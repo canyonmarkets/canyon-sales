@@ -11,8 +11,8 @@ export default function StoreSelector({ value, onChange }: { value: StoreCode; o
             key={s.code}
             onClick={() => onChange(s.code)}
             style={{
-              padding: '8px 16px', borderRadius: 999, cursor: 'pointer',
-              fontSize: 13, fontWeight: 600, letterSpacing: '0.02em',
+              padding: '11px 20px', borderRadius: 999, cursor: 'pointer',
+              fontSize: 14, fontWeight: 600, letterSpacing: '0.02em',
               border: `1px solid ${active ? 'transparent' : 'var(--border-2)'}`,
               background: active ? 'linear-gradient(180deg, var(--ember) 0%, var(--ember-600) 100%)' : 'var(--surface)',
               color: active ? '#fff' : 'var(--text-muted)',
