@@ -15,8 +15,8 @@ export type PresetKey = 'today' | 'yesterday' | 'last7' | 'last30' | 'custom'
 export const PRESETS: { key: PresetKey; label: string }[] = [
   { key: 'today',     label: 'Today' },
   { key: 'yesterday', label: 'Yesterday' },
-  { key: 'last7',     label: 'Last 7 Days' },
-  { key: 'last30',    label: 'Last 30 Days' },
+  { key: 'last7',     label: 'Last 7' },
+  { key: 'last30',    label: 'Last 30' },
   { key: 'custom',    label: 'Custom' },
 ]
 

@@ -23,12 +23,13 @@ function useCountUp(value: number, dur = 750) {
   return n
 }
 
-function Metric({ label, value, accent, hint, delay, kind = 'money' }: { label: string; value: number; accent?: boolean; hint?: string; delay: number; kind?: 'money' | 'count' }) {
+function Metric({ label, value, accent, hint, delay, kind = 'money', span }: { label: string; value: number; accent?: boolean; hint?: string; delay: number; kind?: 'money' | 'count'; span?: boolean }) {
   const n = useCountUp(value)
   const display = kind === 'count' ? Math.round(n).toLocaleString('en-US') : money(n)
   return (
     <div className="card fade-up" style={{
-      padding: '20px 22px', flex: '1 1 165px', minWidth: 155,
+      padding: '16px 18px',
+      gridColumn: span ? '1 / -1' : undefined,
       animationDelay: `${delay}s`,
       borderColor: accent ? 'rgba(224,99,26,0.5)' : 'var(--border)',
       background: accent
@@ -36,7 +37,7 @@ function Metric({ label, value, accent, hint, delay, kind = 'money' }: { label: 
         : 'linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 100%)',
     }}>
       <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>{label}</div>
-      <div className="mono-num" style={{ fontSize: 34, fontWeight: 700, marginTop: 8, color: accent ? '#fff' : 'var(--text)' }}>
+      <div className="mono-num" style={{ fontSize: 'clamp(22px, 5.5vw, 32px)', fontWeight: 700, marginTop: 6, color: accent ? '#fff' : 'var(--text)', whiteSpace: 'nowrap' }}>
         {display}
       </div>
       {hint && <div style={{ fontSize: 11, color: 'var(--text-dim)', marginTop: 4 }}>{hint}</div>}
@@ -57,12 +58,12 @@ export default function SalesSummary({ rows, store, range, overviewRows, overvie
     <div className="fade-in">
       <SectionHeader title="Sales Summary" right={`${s.orders} order${s.orders === 1 ? '' : 's'}`} />
 
-      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(145px, 1fr))', gap: 12 }}>
         <Metric label="Gross Sales" value={s.gross} delay={0.02} />
         <Metric label="Net Sales" value={s.net} hint="no discounts applied" delay={0.06} />
         <Metric label="Tax" value={s.tax} delay={0.10} />
         <Metric label="Transactions" value={s.orders} kind="count" hint="completed sales" delay={0.14} />
-        <Metric label="Total Amount" value={s.total} accent delay={0.18} />
+        <Metric label="Total Amount" value={s.total} accent span delay={0.18} />
       </div>
 
       <WeeklyPerformance rows={overviewRows} store={store} windowRange={overviewRange} />

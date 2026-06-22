@@ -75,7 +75,7 @@ export default function WeeklyPerformance({ rows, store, windowRange }: { rows: 
       </div>
 
       {/* records strip */}
-      <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12, marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
         <Fact icon="🏆" label="Record Day" value={w.bestDay && w.bestDay.total > 0 ? money(w.bestDay.total) : '—'} sub={w.bestDay && w.bestDay.total > 0 ? w.bestDay.label : 'no sales yet'} />
         <Fact icon="📊" label="Daily Avg (7d)" value={money(w.dailyAvg)} sub={`${w.weekTxns} orders this week`} />
         <Fact icon={metric === 'sales' ? '💰' : '🧾'} label="7-Day Total" value={metric === 'sales' ? money(w.weekTotal) : `${w.weekTxns}`} sub={metric === 'sales' ? 'sales' : 'transactions'} />
@@ -87,7 +87,7 @@ export default function WeeklyPerformance({ rows, store, windowRange }: { rows: 
 
 function Fact({ icon, label, value, sub }: { icon: string; label: string; value: string; sub: string }) {
   return (
-    <div style={{ flex: '1 1 150px', minWidth: 140, background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px' }}>
+    <div style={{ background: 'var(--bg-2)', border: '1px solid var(--border)', borderRadius: 12, padding: '12px 14px' }}>
       <div style={{ fontSize: 11, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-dim)', fontWeight: 600 }}>{icon} {label}</div>
       <div className="mono-num" style={{ fontSize: 20, fontWeight: 700, marginTop: 4, color: 'var(--text)' }}>{value}</div>
       <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 2 }}>{sub}</div>

@@ -20,7 +20,7 @@ export default function StoreSelector({ value, onChange }: { value: StoreCode; o
               transition: 'all 0.18s',
             }}
           >
-            {s.code === 'ALL' ? '◎ ' : ''}{s.label}
+            {s.short}
           </button>
         )
       })}
