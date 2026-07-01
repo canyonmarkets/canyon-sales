@@ -1,29 +1,26 @@
 'use client'
 import { STORES, StoreCode } from '../lib/sales'
 
+const selectStyle: React.CSSProperties = {
+  width: '100%',
+  background: 'var(--surface-2)',
+  color: 'var(--text)',
+  border: '1px solid var(--border-2)',
+  borderRadius: 10,
+  padding: '12px 14px',
+  fontSize: 15,
+  fontWeight: 600,
+  fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  cursor: 'pointer',
+  colorScheme: 'dark',
+}
+
 export default function StoreSelector({ value, onChange }: { value: StoreCode; onChange: (s: StoreCode) => void }) {
   return (
-    <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-      {STORES.map((s) => {
-        const active = s.code === value
-        return (
-          <button
-            key={s.code}
-            onClick={() => onChange(s.code)}
-            style={{
-              padding: '11px 20px', borderRadius: 999, cursor: 'pointer',
-              fontSize: 14, fontWeight: 600, letterSpacing: '0.02em',
-              border: `1px solid ${active ? 'transparent' : 'var(--border-2)'}`,
-              background: active ? 'linear-gradient(180deg, var(--ember) 0%, var(--ember-600) 100%)' : 'var(--surface)',
-              color: active ? '#fff' : 'var(--text-muted)',
-              boxShadow: active ? '0 4px 16px var(--ember-glow)' : 'none',
-              transition: 'all 0.18s',
-            }}
-          >
-            {s.short}
-          </button>
-        )
-      })}
-    </div>
+    <select value={value} onChange={(e) => onChange(e.target.value as StoreCode)} style={selectStyle} aria-label="Store">
+      {STORES.map((s) => (
+        <option key={s.code} value={s.code}>{s.label}</option>
+      ))}
+    </select>
   )
 }

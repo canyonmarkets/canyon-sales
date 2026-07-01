@@ -85,17 +85,20 @@ export default function Dashboard() {
         </div>
       </header>
 
-      {/* ── Controls ── */}
-      <div className="card" style={{ padding: '16px 18px', marginBottom: 20, display: 'flex', justifyContent: 'space-between', gap: 18, flexWrap: 'wrap' }}>
-        <div>
-          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 8 }}>Store</div>
+      {/* ── Controls (compact dropdowns keep the data above the fold on a phone) ── */}
+      <div className="card" style={{ padding: '14px 16px', marginBottom: 16, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, minWidth: 130 }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 6 }}>Store</div>
           <StoreSelector value={store} onChange={setStore} />
         </div>
-        <DateFilter
-          preset={preset} customStart={customStart} customEnd={customEnd}
-          onPreset={setPreset}
-          onCustom={(s, e) => { setCustomStart(s); setCustomEnd(e) }}
-        />
+        <div style={{ flex: 1, minWidth: 130 }}>
+          <div style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--text-dim)', marginBottom: 6 }}>Date</div>
+          <DateFilter
+            preset={preset} customStart={customStart} customEnd={customEnd}
+            onPreset={setPreset}
+            onCustom={(s, e) => { setCustomStart(s); setCustomEnd(e) }}
+          />
+        </div>
       </div>
 
       {/* ── Tabs — sticky so you can switch views while scrolled on a phone ── */}
