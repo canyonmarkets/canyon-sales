@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { SaleRow, StoreCode, Range, weekStats, money } from '../lib/sales'
 
-type Metric = 'sales' | 'txns'
+type Metric = 'sales' | 'txns' | 'ticket'
 const compact = (n: number) =>
   n >= 1000 ? '$' + (n / 1000).toFixed(1) + 'k' : '$' + n.toFixed(n < 100 ? 2 : 0)
 
@@ -10,7 +10,11 @@ export default function WeeklyPerformance({ rows, store, windowRange }: { rows: 
   const [metric, setMetric] = useState<Metric>('sales')
   if (!windowRange) return null
   const w = weekStats(rows, store, windowRange)
-  const max = Math.max(1, ...w.series.map((d) => (metric === 'sales' ? d.total : d.orders)))
+  // per-day value for the selected metric: ticket = avg spend per order that day
+  const valueFor = (d: { total: number; orders: number }) =>
+    metric === 'sales' ? d.total : metric === 'txns' ? d.orders : d.orders > 0 ? d.total / d.orders : 0
+  const max = Math.max(1, ...w.series.map(valueFor))
+  const weekAvgTicket = w.weekTxns > 0 ? w.weekTotal / w.weekTxns : 0
 
   const up = w.pctChange !== null && w.pctChange >= 0
   const trendColor = w.pctChange === null ? 'var(--text-dim)' : up ? 'var(--green)' : '#f87171'
@@ -34,7 +38,7 @@ export default function WeeklyPerformance({ rows, store, windowRange }: { rows: 
         </div>
         {/* metric toggle */}
         <div style={{ display: 'flex', gap: 3, background: 'var(--surface-2)', borderRadius: 9, padding: 3 }}>
-          {([['sales', 'Sales'], ['txns', 'Transactions']] as const).map(([k, label]) => (
+          {([['sales', 'Sales'], ['txns', 'Transactions'], ['ticket', 'Ticket']] as const).map(([k, label]) => (
             <button key={k} onClick={() => setMetric(k)}
               style={{
                 padding: '7px 14px', borderRadius: 7, border: 'none', cursor: 'pointer', fontSize: 12.5, fontWeight: 600,
@@ -50,12 +54,12 @@ export default function WeeklyPerformance({ rows, store, windowRange }: { rows: 
       {/* bars */}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'clamp(6px,2vw,18px)', height: 180, padding: '0 4px' }}>
         {w.series.map((d, i) => {
-          const val = metric === 'sales' ? d.total : d.orders
+          const val = valueFor(d)
           const h = (val / max) * 100
           return (
             <div key={d.key} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'flex-end', gap: 8 }}>
               <div className="mono-num" style={{ fontSize: 12, fontWeight: 700, color: d.isToday ? 'var(--ember)' : 'var(--text-muted)', minHeight: 16 }}>
-                {val > 0 ? (metric === 'sales' ? compact(d.total) : d.orders) : ''}
+                {val > 0 ? (metric === 'txns' ? d.orders : compact(val)) : ''}
               </div>
               <div style={{
                 width: '100%', maxWidth: 56, height: `${Math.max(h, val > 0 ? 3 : 0)}%`, borderRadius: '7px 7px 3px 3px',
@@ -78,7 +82,12 @@ export default function WeeklyPerformance({ rows, store, windowRange }: { rows: 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 12, marginTop: 20, paddingTop: 18, borderTop: '1px solid var(--border)' }}>
         <Fact icon="🏆" label="Record Day" value={w.bestDay && w.bestDay.total > 0 ? money(w.bestDay.total) : '—'} sub={w.bestDay && w.bestDay.total > 0 ? w.bestDay.label : 'no sales yet'} />
         <Fact icon="📊" label="Daily Avg (7d)" value={money(w.dailyAvg)} sub={`${w.weekTxns} orders this week`} />
-        <Fact icon={metric === 'sales' ? '💰' : '🧾'} label="7-Day Total" value={metric === 'sales' ? money(w.weekTotal) : `${w.weekTxns}`} sub={metric === 'sales' ? 'sales' : 'transactions'} />
+        <Fact
+          icon={metric === 'sales' ? '💰' : metric === 'txns' ? '🧾' : '🎟️'}
+          label={metric === 'ticket' ? 'Avg Ticket (7d)' : '7-Day Total'}
+          value={metric === 'sales' ? money(w.weekTotal) : metric === 'txns' ? `${w.weekTxns}` : money(weekAvgTicket)}
+          sub={metric === 'sales' ? 'sales' : metric === 'txns' ? 'transactions' : 'per order'}
+        />
         <Fact icon="🔥" label="Busiest Day" value={w.busiest ? w.busiest.dow : '—'} sub={w.busiest ? `${money(w.busiest.avg)} avg` : 'building history'} />
       </div>
     </div>
