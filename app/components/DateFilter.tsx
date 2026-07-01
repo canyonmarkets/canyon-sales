@@ -2,12 +2,11 @@
 import { PRESETS, PresetKey, phxToday } from '../lib/sales'
 
 export default function DateFilter({
-  preset, customStart, customEnd, rangeLabel, onPreset, onCustom,
+  preset, customStart, customEnd, onPreset, onCustom,
 }: {
   preset: PresetKey
   customStart: string
   customEnd: string
-  rangeLabel: string
   onPreset: (p: PresetKey) => void
   onCustom: (start: string, end: string) => void
 }) {
@@ -46,10 +45,6 @@ export default function DateFilter({
             onChange={(e) => onCustom(customStart, e.target.value)} style={inputStyle} />
         </div>
       )}
-
-      <div style={{ fontSize: 12, color: 'var(--text-dim)', letterSpacing: '0.04em' }}>
-        📅 {rangeLabel}
-      </div>
     </div>
   )
 }

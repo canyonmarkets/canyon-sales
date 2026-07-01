@@ -92,7 +92,7 @@ export default function Dashboard() {
           <StoreSelector value={store} onChange={setStore} />
         </div>
         <DateFilter
-          preset={preset} customStart={customStart} customEnd={customEnd} rangeLabel={range.label}
+          preset={preset} customStart={customStart} customEnd={customEnd}
           onPreset={setPreset}
           onCustom={(s, e) => { setCustomStart(s); setCustomEnd(e) }}
         />

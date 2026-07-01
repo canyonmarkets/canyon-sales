@@ -1,13 +1,16 @@
 import { supabase } from './supabase'
 
 // ── Stores ────────────────────────────────────────────────────────────────
-export type StoreCode = 'ALL' | 'SF1' | 'SF2' | 'CC1' | 'CC2'
+export type StoreCode = 'ALL' | 'SF1' | 'SF2' | 'CC1' | 'CC2' | 'MB1'
 export const STORES: { code: StoreCode; label: string; short: string }[] = [
   { code: 'ALL', label: 'All Stores',     short: 'All' },
   { code: 'SF1', label: 'Steel Fab 1',    short: 'SF1' },
   { code: 'SF2', label: 'Steel Fab 2',    short: 'SF2' },
   { code: 'CC1', label: 'Call Center 1',  short: 'CC1' },
   { code: 'CC2', label: 'Call Center 2',  short: 'CC2' },
+  // Mirabella micro-market (coming online ~mid-July 2026). The kiosk installed
+  // there MUST report machine_code = 'MB1' for its sales to land under this pill.
+  { code: 'MB1', label: 'Mirabella',      short: 'MB1' },
 ]
 
 // ── Date presets (America/Phoenix, fixed UTC-7, no DST) ─────────────────────
