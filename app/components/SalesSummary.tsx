@@ -36,7 +36,7 @@ function Metric({ label, value, accent, hint, delay, kind = 'money', span }: { l
         ? 'linear-gradient(180deg, rgba(224,99,26,0.16) 0%, var(--bg-2) 100%)'
         : 'linear-gradient(180deg, var(--surface) 0%, var(--bg-2) 100%)',
     }}>
-      <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 600 }}>{label}</div>
+      <div style={{ fontSize: 14, letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--text-muted)', fontWeight: 700 }}>{label}</div>
       <div className="mono-num" style={{ fontSize: 'clamp(22px, 5.5vw, 32px)', fontWeight: 700, marginTop: 6, color: accent ? '#fff' : 'var(--text)', whiteSpace: 'nowrap' }}>
         {display}
       </div>
