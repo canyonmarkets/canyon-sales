@@ -101,13 +101,14 @@ const num = (v: unknown) => (typeof v === 'number' ? v : parseFloat(String(v ?? 
 const inStore = (r: SaleRow, store: StoreCode) => store === 'ALL' || r.machine_code === store
 
 // ── Aggregations ──────────────────────────────────────────────────────────
-export interface Summary { gross: number; net: number; tax: number; total: number; orders: number }
+export interface Summary { gross: number; net: number; tax: number; total: number; orders: number; itemCount: number }
 export function summarize(rows: SaleRow[], store: StoreCode): Summary {
   const f = rows.filter((r) => inStore(r, store))
   const gross = f.reduce((s, r) => s + r.subtotal, 0) // no discounts → gross = net
   const tax   = f.reduce((s, r) => s + r.tax, 0)
   const total = f.reduce((s, r) => s + r.total, 0)
-  return { gross, net: gross, tax, total, orders: f.length }
+  const itemCount = f.reduce((s, r) => s + r.items.reduce((q, it) => q + (it.qty ?? 0), 0), 0)
+  return { gross, net: gross, tax, total, orders: f.length, itemCount }
 }
 
 export interface ItemAgg { name: string; qty: number; sales: number }

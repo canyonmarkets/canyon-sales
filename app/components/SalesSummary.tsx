@@ -59,10 +59,10 @@ export default function SalesSummary({ rows, store, range, overviewRows, overvie
       <SectionHeader title="Sales Summary" right={`${s.orders} order${s.orders === 1 ? '' : 's'}`} />
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(145px, 1fr))', gap: 12 }}>
-        <Metric label="Gross Sales" value={s.gross} delay={0.02} />
-        <Metric label="Net Sales" value={s.net} hint="no discounts applied" delay={0.06} />
-        <Metric label="Tax" value={s.tax} delay={0.10} />
-        <Metric label="Transactions" value={s.orders} kind="count" hint="completed sales" delay={0.14} />
+        <Metric label="Net Sales" value={s.net} hint="no discounts applied" delay={0.02} />
+        <Metric label="Tax" value={s.tax} delay={0.06} />
+        <Metric label="Transactions" value={s.orders} kind="count" hint="completed sales" delay={0.10} />
+        <Metric label="Items Sold" value={s.itemCount} kind="count" hint="units sold" delay={0.14} />
         <Metric label="Total Amount" value={s.total} accent span delay={0.18} />
       </div>
 
