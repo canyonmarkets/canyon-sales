@@ -47,8 +47,11 @@ export interface Range { start: Date; end: Date; label: string }
 
 export function resolveRange(preset: PresetKey, customStart?: string, customEnd?: string): Range {
   const now = new Date()
+  // Shift into Phoenix time, then format the shifted instant as UTC — formatting
+  // in the runtime's local timezone would double-apply an offset and mislabel
+  // the range by a day (e.g. on a phone already set to Phoenix time).
   const fmt = (d: Date) =>
-    new Date(d.getTime() + PHX_OFFSET_MIN * 60000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    new Date(d.getTime() + PHX_OFFSET_MIN * 60000).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' })
   switch (preset) {
     case 'today':     { const s = startOfPhxDay(0);  return { start: s, end: now, label: 'Today' } }
     case 'yesterday': { const s = startOfPhxDay(1), e = startOfPhxDay(0); return { start: s, end: e, label: 'Yesterday' } }
@@ -76,17 +79,35 @@ export interface SaleRow {
   items: SaleItem[]
 }
 
+/**
+ * Fetch every matching row in pages of 1000. Supabase caps a single select at
+ * 1000 rows by default — without paging, busy ranges (Last 30 / the 90-day
+ * overview) silently truncate and understate revenue.
+ */
+async function fetchAllRows(select: string, range: Range): Promise<Record<string, unknown>[]> {
+  const PAGE = 1000
+  const out: Record<string, unknown>[] = []
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await supabase
+      .from('kiosk_sales')
+      .select(select)
+      .eq('status', 'PROCESSED')
+      .gte('created_at', range.start.toISOString())
+      .lt('created_at', range.end.toISOString())
+      .order('created_at', { ascending: true })
+      .range(from, from + PAGE - 1)
+    if (error) throw error
+    const rows = (data ?? []) as unknown as Record<string, unknown>[]
+    out.push(...rows)
+    if (rows.length < PAGE) break
+  }
+  return out
+}
+
 /** All completed (PROCESSED) sales in the range, every store. */
 export async function fetchSales(range: Range): Promise<SaleRow[]> {
-  const { data, error } = await supabase
-    .from('kiosk_sales')
-    .select('id, machine_code, subtotal, tax, total, created_at, items')
-    .eq('status', 'PROCESSED')
-    .gte('created_at', range.start.toISOString())
-    .lt('created_at', range.end.toISOString())
-    .order('created_at', { ascending: true })
-  if (error) throw error
-  return (data ?? []).map((r: Record<string, unknown>) => ({
+  const data = await fetchAllRows('id, machine_code, subtotal, tax, total, created_at, items', range)
+  return data.map((r: Record<string, unknown>) => ({
     id: String(r.id),
     machine_code: (r.machine_code as string) ?? null,
     subtotal: num(r.subtotal),
@@ -159,15 +180,8 @@ export function lastNDaysRange(days: number): Range {
 
 /** Lightweight fetch (no line items) for the trend/records panels. */
 export async function fetchSalesLite(range: Range): Promise<SaleRow[]> {
-  const { data, error } = await supabase
-    .from('kiosk_sales')
-    .select('id, machine_code, total, created_at')
-    .eq('status', 'PROCESSED')
-    .gte('created_at', range.start.toISOString())
-    .lt('created_at', range.end.toISOString())
-    .order('created_at', { ascending: true })
-  if (error) throw error
-  return (data ?? []).map((r: Record<string, unknown>) => ({
+  const data = await fetchAllRows('id, machine_code, total, created_at', range)
+  return data.map((r: Record<string, unknown>) => ({
     id: String(r.id), machine_code: (r.machine_code as string) ?? null,
     subtotal: 0, tax: 0, total: num(r.total), created_at: String(r.created_at), items: [],
   }))

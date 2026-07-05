@@ -2,8 +2,10 @@ import { createClient } from '@supabase/supabase-js'
 
 // Same Vending-Dash Supabase project the kiosk + dashboard use.
 // Publishable (anon) key — safe to ship in the client bundle.
-// NOTE (pre-publish): kiosk_sales is currently anon-readable. Before this
-// dashboard goes public, gate it behind auth + restrict kiosk_sales SELECT.
+// kiosk_sales SELECT is RLS-restricted to authenticated users; AuthGate.tsx
+// handles login. An anonymous visitor with this key reads zero sales rows.
+// Remaining trust assumption: "any authenticated user" = Jeff/Joleen only, so
+// Supabase email SIGNUPS must stay disabled (Auth → Providers → Email).
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://zgmxmficzvlpzkosdcnx.supabase.co'
 const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'sb_publishable_MUAaPltQkyDFsR0NvLTikQ_gY_pfJFy'
 

@@ -32,7 +32,10 @@ export default function DateFilter({
       {preset === 'custom' && (
         <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
           <input type="date" value={customStart} max={today}
-            onChange={(e) => onCustom(e.target.value, customEnd)} style={inputStyle} aria-label="Start date" />
+            // If the new start passes the current end, drag the end along so the
+            // range can never be inverted (start > end = empty query, blank page).
+            onChange={(e) => onCustom(e.target.value, e.target.value > customEnd ? e.target.value : customEnd)}
+            style={inputStyle} aria-label="Start date" />
           <input type="date" value={customEnd} max={today} min={customStart}
             onChange={(e) => onCustom(customStart, e.target.value)} style={inputStyle} aria-label="End date" />
         </div>

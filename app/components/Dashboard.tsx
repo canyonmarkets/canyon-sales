@@ -39,7 +39,10 @@ export default function Dashboard() {
       setError(null)
       setUpdatedAt(new Date())
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Failed to load sales')
+      // A failed background refresh shouldn't blow away data that's already on
+      // screen — keep showing the last good load and let the next tick retry.
+      // Manual loads / first load still surface the error card.
+      if (!quiet) setError(e instanceof Error ? e.message : 'Failed to load sales')
     } finally {
       setLoading(false)
     }
