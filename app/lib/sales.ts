@@ -23,6 +23,13 @@ export const PRESETS: { key: PresetKey; label: string }[] = [
   { key: 'custom',    label: 'Custom' },
 ]
 
+// Only these market kiosks belong in this sales report. Pantry machines
+// (e.g. CP1 "Clayco Pantry") are wired up completely separately — billed
+// monthly, untaxed, not a Stripe charge — and their demo/real rows must NEVER
+// appear here. We filter to this allowlist at the query so nothing outside the
+// markets can leak into any total, now or when new machine_codes appear.
+const MARKET_CODES = ['SF1', 'SF2', 'CC1', 'CC2', 'MB1'] as const
+
 const PHX_OFFSET_MIN = -7 * 60
 
 /** Phoenix midnight, `daysAgo` days back, as a real UTC instant. */
@@ -92,6 +99,7 @@ async function fetchAllRows(select: string, range: Range): Promise<Record<string
       .from('kiosk_sales')
       .select(select)
       .eq('status', 'PROCESSED')
+      .in('machine_code', MARKET_CODES as unknown as string[])
       .gte('created_at', range.start.toISOString())
       .lt('created_at', range.end.toISOString())
       .order('created_at', { ascending: true })
