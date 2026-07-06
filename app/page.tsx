@@ -8,7 +8,7 @@ export default function Page() {
   const [done, setDone] = useState(false)
   return (
     <>
-      {/* AuthGate shows the login screen until signed in; once authed the
+      {/* AuthGate shows the magic-link login until signed in; once authed the
           Dashboard mounts and fetches under the splash. */}
       <AuthGate>
         <Dashboard />

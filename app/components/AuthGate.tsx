@@ -21,16 +21,25 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
 function LoginScreen() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
+  const [sent, setSent] = useState(false)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     setBusy(true); setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
+    // Passwordless magic link. shouldCreateUser:false keeps it locked to the
+    // existing operator accounts (Jeff/Joleen) — a stranger's email gets no link.
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        shouldCreateUser: false,
+        emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined,
+      },
+    })
     if (error) { setError(error.message); setBusy(false) }
-    // on success, onAuthStateChange in AuthGate swaps to the dashboard
+    else { setSent(true); setBusy(false) }
+    // on click-through, onAuthStateChange in AuthGate swaps to the dashboard
   }
 
   return (
@@ -45,23 +54,32 @@ function LoginScreen() {
           <div style={{ fontSize: 12, letterSpacing: '0.34em', textTransform: 'uppercase', color: 'var(--ember)', fontWeight: 600, marginTop: 4 }}>Sales Dashboard</div>
         </div>
 
-        <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" style={inputStyle} />
-        <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required autoComplete="current-password" style={inputStyle} />
+        {sent ? (
+          <div style={{ textAlign: 'center', fontSize: 14, color: 'var(--text)', lineHeight: 1.5 }}>
+            Check your email — we sent a sign-in link to<br />
+            <span style={{ color: 'var(--ember)', fontWeight: 600 }}>{email.trim()}</span>.<br />
+            <span style={{ fontSize: 12, color: 'var(--text-dim)' }}>Tap the link on this device to open the dashboard.</span>
+          </div>
+        ) : (
+          <>
+            <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" style={inputStyle} />
 
-        {error && <div style={{ fontSize: 13, color: '#fca5a5', textAlign: 'center' }}>{error}</div>}
+            {error && <div style={{ fontSize: 13, color: '#fca5a5', textAlign: 'center' }}>{error}</div>}
 
-        <button type="submit" disabled={busy} style={{
-          width: '100%', padding: '13px 0', borderRadius: 10, border: 'none',
-          background: busy ? 'var(--surface-2)' : 'linear-gradient(180deg, var(--ember) 0%, var(--ember-600) 100%)',
-          color: '#fff', fontSize: 15, fontWeight: 700, letterSpacing: '0.04em', cursor: busy ? 'wait' : 'pointer',
-          boxShadow: busy ? 'none' : '0 6px 18px var(--ember-glow)',
-        }}>
-          {busy ? 'Signing in…' : 'Sign In'}
-        </button>
+            <button type="submit" disabled={busy} style={{
+              width: '100%', padding: '13px 0', borderRadius: 10, border: 'none',
+              background: busy ? 'var(--surface-2)' : 'linear-gradient(180deg, var(--ember) 0%, var(--ember-600) 100%)',
+              color: '#fff', fontSize: 15, fontWeight: 700, letterSpacing: '0.04em', cursor: busy ? 'wait' : 'pointer',
+              boxShadow: busy ? 'none' : '0 6px 18px var(--ember-glow)',
+            }}>
+              {busy ? 'Sending link…' : 'Email me a sign-in link'}
+            </button>
 
-        <div style={{ fontSize: 11, color: 'var(--text-dim)', textAlign: 'center' }}>
-          Use the same login as your vending dashboard. You&apos;ll stay signed in on this device.
-        </div>
+            <div style={{ fontSize: 11, color: 'var(--text-dim)', textAlign: 'center' }}>
+              No password needed. Enter your email and we&apos;ll send a one-tap sign-in link. You&apos;ll stay signed in on this device.
+            </div>
+          </>
+        )}
       </form>
     </div>
   )
