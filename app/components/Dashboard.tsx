@@ -80,6 +80,10 @@ export default function Dashboard() {
             style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, width: 44, height: 44, cursor: 'pointer', fontSize: 18 }}>
             ⟳
           </button>
+          <button onClick={() => window.open('https://cloud.fully-kiosk.com/cloud/devices', '_blank', 'noopener,noreferrer')} title="Open Fully Cloud kiosk monitoring"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, height: 44, padding: '0 18px', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
+            Kiosks
+          </button>
           <button onClick={() => { try { localStorage.removeItem('canyon-sales-unlocked') } catch { /* storage disabled */ } location.reload() }} title="Lock"
             style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, height: 44, padding: '0 18px', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
             Lock
