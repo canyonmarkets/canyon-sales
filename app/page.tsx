@@ -1,18 +1,18 @@
 'use client'
 import { useState } from 'react'
 import SplashScreen from './components/SplashScreen'
-import AuthGate from './components/AuthGate'
+import PinGate from './components/PinGate'
 import Dashboard from './components/Dashboard'
 
 export default function Page() {
   const [done, setDone] = useState(false)
   return (
     <>
-      {/* AuthGate shows the magic-link login until signed in; once authed the
+      {/* PinGate shows the shared access code until unlocked; once unlocked the
           Dashboard mounts and fetches under the splash. */}
-      <AuthGate>
+      <PinGate>
         <Dashboard />
-      </AuthGate>
+      </PinGate>
       {!done && <SplashScreen onDone={() => setDone(true)} />}
     </>
   )

@@ -2,7 +2,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import { StoreCode, PresetKey, SaleRow, resolveRange, fetchSales, fetchSalesLite, lastNDaysRange, phxToday, STORES } from '../lib/sales'
-import { supabase } from '../lib/supabase'
 import StoreSelector from './StoreSelector'
 import DateFilter from './DateFilter'
 import SalesSummary from './SalesSummary'
@@ -81,9 +80,9 @@ export default function Dashboard() {
             style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, width: 44, height: 44, cursor: 'pointer', fontSize: 18 }}>
             ⟳
           </button>
-          <button onClick={() => supabase.auth.signOut()} title="Sign out"
+          <button onClick={() => { try { localStorage.removeItem('canyon-sales-unlocked') } catch { /* storage disabled */ } location.reload() }} title="Lock"
             style={{ background: 'var(--surface)', border: '1px solid var(--border-2)', color: 'var(--text-muted)', borderRadius: 10, height: 44, padding: '0 18px', cursor: 'pointer', fontSize: 14, fontWeight: 600 }}>
-            Sign out
+            Lock
           </button>
         </div>
       </header>
