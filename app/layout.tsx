@@ -5,7 +5,16 @@ export const metadata: Metadata = {
   title: 'Canyon Markets — Sales',
   description: 'Live sales dashboard for Canyon Markets kiosks',
   manifest: '/manifest.webmanifest',
-  appleWebApp: { capable: true, title: 'Canyon Sales', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'Sales', statusBarStyle: 'default' },
+  icons: {
+    icon: [
+      { url: '/icon-sales-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-sales-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/icon-sales-192.png', sizes: '192x192', type: 'image/png' },
+    ],
+  },
 }
 
 export const viewport: Viewport = {
