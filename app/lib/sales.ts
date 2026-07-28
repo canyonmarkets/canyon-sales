@@ -196,7 +196,9 @@ export async function fetchSalesLite(range: Range): Promise<SaleRow[]> {
 }
 
 const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+export const DOW_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 const weekdayOf = (key: string) => DOW[new Date(key + 'T00:00:00Z').getUTCDay()]
+const phxTodayKey = () => new Date(Date.now() + PHX_OFFSET_MIN * 60000).toISOString().slice(0, 10)
 
 export interface WeekStats {
   series: (DayPoint & { dow: string; isToday: boolean })[]
@@ -232,6 +234,127 @@ export function weekStats(rows: SaleRow[], store: StoreCode, windowRange: Range)
     series: last7.map((p) => ({ ...p, dow: weekdayOf(p.key), isToday: p.key === todayKey })),
     weekTotal, weekTxns: sum(last7, 'orders'), prevWeekTotal, pctChange, bestDay, dailyAvg: weekTotal / 7, busiest,
   }
+}
+
+// ── Same-weekday comparison ─────────────────────────────────────────────────
+// "How do my last 4 Thursdays stack up?" — answered off the same rolling 90-day
+// lite fetch the weekly panel already uses (≈12 shots at every weekday), so this
+// costs no extra query.
+
+export interface DayOccurrence extends DayPoint { dow: string; isToday: boolean }
+
+/**
+ * Days before a store's first sale are pre-open, not slow — averaging them in
+ * would punish a new market (MB1) forever. Trim only the LEADING dead days; a
+ * zero after opening is a real (bad) day and must still count.
+ */
+function trimPreOpen(pts: DayPoint[]): DayPoint[] {
+  const i = pts.findIndex((p) => p.orders > 0)
+  return i < 0 ? [] : pts.slice(i)
+}
+
+const decorate = (p: DayPoint, todayKey: string): DayOccurrence => ({
+  ...p, dow: weekdayOf(p.key), isToday: p.key === todayKey,
+})
+
+export interface WeekdayStats {
+  dowIndex: number
+  dow: string
+  dowLong: string
+  /** Oldest → newest. Includes today when today IS this weekday (still partial). */
+  occurrences: DayOccurrence[]
+  /** Occurrences excluding a partial today — the only ones fair to average/rank. */
+  completed: DayOccurrence[]
+  avgTotal: number
+  avgOrders: number
+  avgTicket: number
+  best: DayOccurrence | null
+  worst: DayOccurrence | null
+  /** Most recent COMPLETED occurrence. */
+  latest: DayOccurrence | null
+  /** Latest completed vs the average of the ones before it. Null under 2 data points. */
+  pctVsPrior: number | null
+  /** Store-wide averages across every completed day, for "is this weekday weak?" */
+  allDayAvg: number
+  allDayAvgOrders: number
+  allDayAvgTicket: number
+}
+
+/** The last `count` occurrences of one weekday (0=Sun … 6=Sat) inside the window. */
+export function weekdayStats(
+  rows: SaleRow[], store: StoreCode, windowRange: Range, dowIndex: number, count = 4,
+): WeekdayStats {
+  const todayKey = phxTodayKey()
+  const pts = trimPreOpen(dailySeries(rows, store, windowRange))
+  const hits = pts
+    .filter((p) => new Date(p.key + 'T00:00:00Z').getUTCDay() === dowIndex)
+    .map((p) => decorate(p, todayKey))
+  // Take the last `count` COMPLETED days, then re-attach a partial today so the
+  // in-progress day is visible without stealing a comparison slot.
+  const partialToday = hits.find((h) => h.isToday) ?? null
+  const done = hits.filter((h) => !h.isToday)
+  const shownDone = done.slice(-count)
+  const occurrences = partialToday ? [...shownDone, partialToday] : shownDone
+
+  const sum = (a: DayOccurrence[], k: 'total' | 'orders') => a.reduce((s, p) => s + p[k], 0)
+  const avgTotal = shownDone.length ? sum(shownDone, 'total') / shownDone.length : 0
+  const avgOrders = shownDone.length ? sum(shownDone, 'orders') / shownDone.length : 0
+  const totalOrders = sum(shownDone, 'orders')
+
+  const best = shownDone.reduce<DayOccurrence | null>((m, p) => (p.total > (m?.total ?? -1) ? p : m), null)
+  const worst = shownDone.reduce<DayOccurrence | null>((m, p) => (p.total < (m?.total ?? Infinity) ? p : m), null)
+  const latest = shownDone.length ? shownDone[shownDone.length - 1] : null
+  const prior = shownDone.slice(0, -1)
+  const priorAvg = prior.length ? sum(prior, 'total') / prior.length : 0
+  const pctVsPrior = latest && priorAvg > 0 ? ((latest.total - priorAvg) / priorAvg) * 100 : null
+
+  const completedDays = pts.filter((p) => p.key !== todayKey)
+  const allTotal = completedDays.reduce((s, p) => s + p.total, 0)
+  const allOrders = completedDays.reduce((s, p) => s + p.orders, 0)
+  const allDayAvg = completedDays.length ? allTotal / completedDays.length : 0
+
+  return {
+    dowIndex, dow: DOW[dowIndex], dowLong: DOW_LONG[dowIndex],
+    occurrences, completed: shownDone,
+    avgTotal, avgOrders, avgTicket: totalOrders > 0 ? sum(shownDone, 'total') / totalOrders : 0,
+    best, worst, latest, pctVsPrior,
+    allDayAvg,
+    allDayAvgOrders: completedDays.length ? allOrders / completedDays.length : 0,
+    allDayAvgTicket: allOrders > 0 ? allTotal / allOrders : 0,
+  }
+}
+
+export interface WeekdayAvg {
+  dowIndex: number
+  dow: string
+  dowLong: string
+  days: number          // completed occurrences averaged
+  total: number
+  orders: number
+  avgTotal: number
+  avgOrders: number
+  avgTicket: number
+}
+
+/**
+ * Every weekday averaged across the window — the "which days are dragging?" view.
+ * Excludes a partial today and pre-open days for the same reasons as above.
+ */
+export function weekdayAverages(rows: SaleRow[], store: StoreCode, windowRange: Range): WeekdayAvg[] {
+  const todayKey = phxTodayKey()
+  const pts = trimPreOpen(dailySeries(rows, store, windowRange)).filter((p) => p.key !== todayKey)
+  return DOW.map((_, dowIndex) => {
+    const hits = pts.filter((p) => new Date(p.key + 'T00:00:00Z').getUTCDay() === dowIndex)
+    const total = hits.reduce((s, p) => s + p.total, 0)
+    const orders = hits.reduce((s, p) => s + p.orders, 0)
+    return {
+      dowIndex, dow: DOW[dowIndex], dowLong: DOW_LONG[dowIndex],
+      days: hits.length, total, orders,
+      avgTotal: hits.length ? total / hits.length : 0,
+      avgOrders: hits.length ? orders / hits.length : 0,
+      avgTicket: orders > 0 ? total / orders : 0,
+    }
+  })
 }
 
 // ── Format helpers ──────────────────────────────────────────────────────────
