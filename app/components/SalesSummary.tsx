@@ -51,7 +51,8 @@ export default function SalesSummary({ rows, store, range, overviewRows, overvie
   const showChart = series.length >= 2
 
   // per-store breakdown (only meaningful when viewing All)
-  const byStore = STORES.filter((x) => x.code !== 'ALL').map((x) => ({ ...x, t: summarize(rows, x.code).total }))
+  // Pre-tax (net), so the bars add up to the Net Sales headline above them.
+  const byStore = STORES.filter((x) => x.code !== 'ALL').map((x) => ({ ...x, t: summarize(rows, x.code).net }))
   const maxStore = Math.max(1, ...byStore.map((b) => b.t))
 
   return (

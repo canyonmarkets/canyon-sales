@@ -175,7 +175,9 @@ export function dailySeries(rows: SaleRow[], store: StoreCode, range: Range): Da
     if (!inStore(r, store)) continue
     const key = new Date(new Date(r.created_at).getTime() + PHX_OFFSET_MIN * 60000).toISOString().slice(0, 10)
     const b = buckets.get(key)
-    if (b) { b.total += r.total; b.orders += 1 }
+    // Pre-tax, so the trend/weekly panels agree with the headline Net Sales and
+    // the dashboard (`total` here is the DayPoint field name, not the tax-inclusive total).
+    if (b) { b.total += r.subtotal; b.orders += 1 }
   }
   return [...buckets.values()]
 }
@@ -188,10 +190,10 @@ export function lastNDaysRange(days: number): Range {
 
 /** Lightweight fetch (no line items) for the trend/records panels. */
 export async function fetchSalesLite(range: Range): Promise<SaleRow[]> {
-  const data = await fetchAllRows('id, machine_code, total, created_at', range)
+  const data = await fetchAllRows('id, machine_code, subtotal, total, created_at', range)
   return data.map((r: Record<string, unknown>) => ({
     id: String(r.id), machine_code: (r.machine_code as string) ?? null,
-    subtotal: 0, tax: 0, total: num(r.total), created_at: String(r.created_at), items: [],
+    subtotal: num(r.subtotal), tax: 0, total: num(r.total), created_at: String(r.created_at), items: [],
   }))
 }
 
